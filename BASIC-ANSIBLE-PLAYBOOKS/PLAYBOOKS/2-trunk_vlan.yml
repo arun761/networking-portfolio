@@ -1,0 +1,13 @@
+- name: Trunk Port Configuration
+  hosts: switches
+  gather_facts: no
+
+  tasks:
+    - name: Generate trunk port config
+      copy:
+        content: |
+          interface {{ trunk_port }}
+           switchport mode trunk
+           switchport trunk allowed vlan {{ allowed_vlans }}
+           no shutdown
+        dest: "./configs/{{ inventory_hostname }}_trunk.cfg"
