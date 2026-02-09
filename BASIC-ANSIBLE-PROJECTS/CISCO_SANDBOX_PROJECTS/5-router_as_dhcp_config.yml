@@ -1,0 +1,21 @@
+- name: Configure Router as DHCP Server
+  hosts: routers
+  gather_facts: no
+
+  tasks:
+    - name: Exclude gateway address
+      cisco.ios.ios_config:
+        lines:
+          - ip dhcp excluded-address 192.168.100.1
+        match: line
+        save_when: modified
+
+    - name: Create DHCP Pool
+      cisco.ios.ios_config:
+        parents: ip dhcp pool VLAN100_POOL
+        lines:
+          - network 192.168.100.0 255.255.255.0
+          - default-router 192.168.100.1
+          - dns-server 8.8.8.8
+        match: line
+        save_when: modified

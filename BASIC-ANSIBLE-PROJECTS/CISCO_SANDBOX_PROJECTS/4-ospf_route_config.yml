@@ -1,0 +1,25 @@
+- name: Configure OSPF
+  hosts: routers
+  gather_facts: no
+
+  vars:
+    ospf_networks:
+      - { network: "10.10.10.1", wildcard: "0.0.0.0", area: 0 }
+      - { network: "10.10.20.1", wildcard: "0.0.0.0", area: 0 }
+
+  tasks:
+    - name: Set OSPF Router ID
+      cisco.ios.ios_config:
+        parents: router ospf 1
+        lines:
+          - router-id 1.1.1.1
+        match: line
+
+    - name: Advertise Networks in OSPF
+      cisco.ios.ios_config:
+        parents: router ospf 1
+        lines:
+          - "network {{ item.network }} {{ item.wildcard }} area {{ item.area }}"
+        match: line
+        save_when: modified
+      loop: "{{ ospf_networks }}"

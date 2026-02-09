@@ -1,0 +1,17 @@
+- name: Configure Multiple Static Routes
+  hosts: routers
+  gather_facts: no
+
+  vars:
+    static_routes:
+      - { network: "172.16.1.0", mask: "255.255.255.0", next_hop: "10.10.10.2" }
+      - { network: "172.16.2.0", mask: "255.255.255.0", next_hop: "10.10.20.2" }
+
+  tasks:
+    - name: Configure Static Routes
+      cisco.ios.ios_config:
+        lines:
+          - "ip route {{ item.network }} {{ item.mask }} {{ item.next_hop }}"
+        match: line
+        save_when: modified
+      loop: "{{ static_routes }}"

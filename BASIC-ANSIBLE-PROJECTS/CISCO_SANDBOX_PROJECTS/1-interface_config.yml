@@ -1,0 +1,19 @@
+- name: Configure Multiple Loopback Interfaces
+  hosts: routers
+  gather_facts: no
+
+  vars:
+    loopbacks:
+      - { id: 10, ip: "10.10.10.1" }
+      - { id: 20, ip: "10.10.20.1" }
+
+  tasks:
+    - name: Configure Loopback Interfaces
+      cisco.ios.ios_config:
+        parents: "interface Loopback{{ item.id }}"
+        lines:
+          - description Configured via Ansible
+          - ip address {{ item.ip }} 255.255.255.255
+        match: line
+        save_when: modified
+      loop: "{{ loopbacks }}"

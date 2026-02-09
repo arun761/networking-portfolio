@@ -1,0 +1,20 @@
+- name: Configure Sub-Interfaces
+  hosts: routers
+  gather_facts: no
+
+  vars:
+    sub_interfaces:
+      - { id: 100, ip: "192.168.100.1", vlan: 100 }
+      - { id: 200, ip: "192.168.200.1", vlan: 200 }
+
+  tasks:
+    - name: Configure Subinterfaces
+      cisco.ios.ios_config:
+        parents: "interface GigabitEthernet1.{{ item.vlan }}"
+        lines:
+          - encapsulation dot1Q {{ item.vlan }}
+          - ip address {{ item.ip }} 255.255.255.0
+          - no shutdown
+        match: line
+        save_when: modified
+      loop: "{{ sub_interfaces }}"
