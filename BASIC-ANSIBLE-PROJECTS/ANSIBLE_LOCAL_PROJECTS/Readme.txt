@@ -1,4 +1,4 @@
-Ansible Network Automation with Cisco DevNet Sandbox:
+Ansible Network Automation with WSL:
 
 This project demonstrates basic network automation using Ansible on a local Linux system (WSL) and locally stores in GENERATED_CONFIG folder.
 

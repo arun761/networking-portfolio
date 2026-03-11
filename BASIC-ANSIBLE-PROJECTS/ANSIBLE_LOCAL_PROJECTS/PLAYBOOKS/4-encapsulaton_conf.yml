@@ -1,0 +1,15 @@
+- name: Truqk Encapsulation Config
+  hosts: switches
+  gather_facts: no
+
+  tasks:
+    - name: creating encapsulation automation by ansible
+      copy:
+        content: |
+          interface {{ trunk_port }}
+           switchport trunk encapsulation dot1q
+           switchport mode trunk
+           switchport trunk native vlan {{ native_vlan }}
+           switchport trunk allowed vlan {{ allowed_vlans | join(',') }}
+           no shut
+        dest: "./configs/{{ inventory_hostname }}_dot1q.cfg"

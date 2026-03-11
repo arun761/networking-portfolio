@@ -1,0 +1,29 @@
+- name: this is ansible playbook
+  hosts: switches
+  gather_facts: no
+
+  vars:
+    channel_group: 1
+    member_interfaces:
+      - "GigabitEthernet0/1"
+      - "GigabitEthernet0/2"
+    allowed_vlans:
+      - 10
+      - 20
+      - 30
+
+  tasks:
+    - name: this is used to configure etherchannel
+      copy:
+        content: |
+          {% for intf in member_interfaces %}
+          interface {{ intf }}
+           channel-group {{ channel_group }} mode active
+           no shutdown
+          {% endfor %}
+
+          interface Port-channel{{ channel_group }}
+           switchport mode trunk
+           switchport trunk allowed vlan {{ allowed_vlans | join(',') }}
+           no shutdown
+        dest: "./configs/{{ inventory_hostname }}_etherchannel.cfg"

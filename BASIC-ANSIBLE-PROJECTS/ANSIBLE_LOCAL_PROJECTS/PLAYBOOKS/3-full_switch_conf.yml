@@ -1,0 +1,40 @@
+- name: This is Ansible configuration file
+  hosts: switches
+  gather_facts: no
+
+  vars:
+    vlans:
+      - {id: 10, name: SALES}
+      - {id: 20, name: HR}
+      - {id: 30, name: IT}
+
+    access_ports:
+       - {int_name: fa0/1, vlan_id: 10}
+       - {int_name: fa0/2, vlan_id: 20}
+       - {int_name: fa0/3, vlan_id: 30}
+
+    trunk_port:
+       interface: "fa0/24"
+       allowed_vlan: "10,20,30"
+
+  tasks:
+    - name: this is all vlan configurations for switch
+      copy:
+        content: |
+           {% for vlan in vlans %}                             //jinja2 syntax
+           vlan {{vlan.id}}
+            name {{vlan.name}}
+           {% endfor %}
+           
+           {% for port in access_ports %}
+           interface {{port.int_name}}
+            switchport mode access
+            switchport access vlan {{port.vlan_id}}
+            no shut
+           {% endfor %}
+           
+           int {{trunk_port.interface}}
+            switchport mode trunk
+            switchport trunk allowed {{trunk_port.allowed_vlan}}
+            no shutdown
+        dest: "./configs/{{inventory_hostname}}_allconfig.cfg"
